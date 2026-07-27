@@ -1,695 +1,219 @@
-<!DOCTYPE html>
+/* AIfluence — camada de movimento
+   Progressive enhancement: se o GSAP nao carregar, a pagina continua
+   inteira e legivel. Nada aqui esconde conteudo antes de confirmar
+   que a biblioteca chegou. */
+(() => {
+  "use strict";
 
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8"/>
-<meta content="width=device-width, initial-scale=1" name="viewport"/>
-<!-- ===== TÍTULO E DESCRIÇÃO ===== -->
-<title>AIfluence | Atendimento com IA no WhatsApp para escritórios de advocacia</title>
-<meta content="Atendimento com IA no WhatsApp para escritórios de advocacia: responde em segundos, qualifica o lead e registra tudo no CRM, 24 horas por dia." name="description"/>
-<!-- ===== FAVICON ===== -->
-<link href="./favicon.ico" rel="icon" sizes="any"/>
-<link href="./assets/favicon-32.png" rel="icon" sizes="32x32" type="image/png"/>
-<link href="./assets/favicon-192.png" rel="icon" sizes="192x192" type="image/png"/>
-<link href="./assets/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
-<meta content="#00001E" name="theme-color"/>
-<!-- ===== OPEN GRAPH (WhatsApp, LinkedIn, Facebook) =====
-     URLs absolutas apontando para https://adv.aifluence.com.br
-     Se um dia o domínio mudar, troque nas 4 linhas com "adv.aifluence.com.br". -->
-<link href="https://adv.aifluence.com.br/" rel="canonical"/>
-<meta content="https://adv.aifluence.com.br/" property="og:url"/>
-<meta content="https://adv.aifluence.com.br/assets/og-aifluence.jpg" property="og:image"/>
-<meta content="website" property="og:type"/>
-<meta content="AIfluence" property="og:site_name"/>
-<meta content="pt_BR" property="og:locale"/>
-<meta content="AIfluence | Atendimento com IA no WhatsApp para escritórios de advocacia" property="og:title"/>
-<meta content="Responde em segundos, qualifica o lead e registra tudo no CRM — 24 horas por dia, 7 dias por semana." property="og:description"/>
-<meta content="image/jpeg" property="og:image:type"/>
-<meta content="1200" property="og:image:width"/>
-<meta content="630" property="og:image:height"/>
-<meta content="AIfluence — atendimento com IA no WhatsApp para escritórios de advocacia" property="og:image:alt"/>
-<!-- ===== TWITTER / X ===== -->
-<meta content="summary_large_image" name="twitter:card"/>
-<meta content="AIfluence | Atendimento com IA no WhatsApp para escritórios de advocacia" name="twitter:title"/>
-<meta content="Responde em segundos, qualifica o lead e registra tudo no CRM — 24 horas por dia, 7 dias por semana." name="twitter:description"/>
-<meta content="https://adv.aifluence.com.br/assets/og-aifluence.jpg" name="twitter:image"/>
-<link href="https://fonts.googleapis.com" rel="preconnect"/>
-<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&amp;family=IBM+Plex+Sans:wght@400;500;600&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
-<style>
-html { scroll-behavior: smooth; }
-  body { margin: 0; background: #00001E; color: #F8F2DC; font-family: 'IBM Plex Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
-  * { box-sizing: border-box; }
-  a { color: #00DA84; text-decoration: none; }
-  a:hover { color: #F8F2DC; }
-  summary::-webkit-details-marker { display: none; }
-  summary { list-style: none; cursor: pointer; }
-  :focus-visible { outline: 2px solid #00DA84; outline-offset: 3px; }
-  @keyframes acDot { 0%,100% { box-shadow: 0 0 0 0 rgba(0,218,132,.55); } 50% { box-shadow: 0 0 0 10px rgba(0,218,132,0); } }
-  @keyframes acMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
-  @keyframes acBar { from { width: 2%; } }
-  @keyframes acFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-  @keyframes acDash { to { stroke-dashoffset: 0; } }
-  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } html { scroll-behavior: auto; } }
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const mobile = window.matchMedia("(max-width: 760px)").matches;
 
-  /* ---- layout responsivo (antes feito em JS) ---- */
-  .gr1{grid-template-columns:minmax(0, 1.05fr) minmax(0, .95fr);}
-  @media (max-width:880px){.gr1{grid-template-columns:minmax(0, 1fr);}}
-  .gr2{grid-template-columns:repeat(4, minmax(0, 1fr));}
-  @media (max-width:560px){.gr2{grid-template-columns:repeat(2, minmax(0, 1fr));}}
-  .gr3{grid-template-columns:minmax(0, 1.35fr) minmax(0, 1fr);}
-  @media (max-width:880px){.gr3{grid-template-columns:minmax(0, 1fr);}}
-  .gr4{grid-template-columns:repeat(3, minmax(0, 1fr));}
-  @media (max-width:980px){.gr4{grid-template-columns:repeat(2, minmax(0, 1fr));}}
-  @media (max-width:700px){.gr4{grid-template-columns:minmax(0, 1fr);}}
-  .gr5{grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);}
-  @media (max-width:880px){.gr5{grid-template-columns:minmax(0, 1fr);}}
-  .gr6{grid-template-columns:minmax(0, 1fr);}
-  .gr7{grid-template-columns:320px minmax(0, 1fr);}
-  @media (max-width:880px){.gr7{grid-template-columns:minmax(0, 1fr);}}
-  .gr8{grid-template-columns:minmax(0, 1fr) minmax(0, 1.1fr);}
-  @media (max-width:880px){.gr8{grid-template-columns:minmax(0, 1fr);}}
-  .gr9{grid-template-columns:repeat(2, minmax(0, 1fr));}
-  @media (max-width:700px){.gr9{grid-template-columns:minmax(0, 1fr);}}
-  .gr10{grid-template-columns:64px minmax(0, 1fr);}
-  .gr11{grid-template-columns:minmax(0, 1.25fr) minmax(0, .85fr);}
-  @media (max-width:880px){.gr11{grid-template-columns:minmax(0, 1fr);}}
-  .gr12{grid-template-columns:minmax(0, .8fr) minmax(0, 1.2fr);}
-  @media (max-width:880px){.gr12{grid-template-columns:minmax(0, 1fr);}}
-  .gr13{grid-template-columns:minmax(0, 1.3fr) repeat(3, minmax(0, .9fr));}
-  @media (max-width:980px){.gr13{grid-template-columns:repeat(2, minmax(0, 1fr));}}
-  @media (max-width:700px){.gr13{grid-template-columns:minmax(0, 1fr);}}
+  /* ------------------------------------------------------------------
+     1. CAMPO DE PARTICULAS
+     Reescrito. A versao anterior chamava sizeCanvas() dentro do loop de
+     desenho, e atribuir canvas.width realoca o buffer inteiro e reseta o
+     contexto — 60x por segundo. Agora dimensiona so no init e no resize.
+  ------------------------------------------------------------------ */
+  const canvas = document.getElementById("fx");
+  if (canvas && !reduce) {
+    const ctx = canvas.getContext("2d", { alpha: true });
+    let w = 0, h = 0, nodes = [], raf = 0, running = false;
 
-  .navlinks { display: none; }
-  @media (min-width: 981px) { .navlinks { display: flex; } }
-  .mobilebar { display: none; }
-  @media (max-width: 760px) { .mobilebar { display: block; } }
+    const LINK_DIST = mobile ? 96 : 130;
+    const MAX_NODES = mobile ? 26 : 58;
 
-  /* ---- hovers (antes atributo style-hover) ---- */
-  .hv-line { transition: border-color 200ms ease; }
-  .hv-line:hover { border-color: rgba(248,242,220,.38); }
-  .hv-acc  { transition: border-color 200ms ease; }
-  .hv-acc:hover { border-color: var(--acc); }
-  .hv-lift { transition: transform 200ms ease, box-shadow 200ms ease; }
-  .hv-lift:hover { transform: translateY(-2px); }
+    function size() {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = window.innerWidth;
+      h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
 
-  /* ---- barra de progresso de leitura ---- */
-  #progress {
-    position: fixed; top: 0; left: 0; height: 2px; width: 100%;
-    transform: scaleX(0); transform-origin: 0 50%;
-    background: linear-gradient(90deg, var(--acc), #0A89B9);
-    z-index: 60; pointer-events: none;
+    function build() {
+      const n = Math.min(MAX_NODES, Math.round((w * h) / 18000));
+      nodes = Array.from({ length: n }, () => ({
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.18,
+        vy: (Math.random() - 0.5) * 0.18,
+        r: 0.5 + Math.random() * 1.4,
+        col: Math.random() < 0.5 ? "rgba(0,218,132,.55)" : "rgba(10,137,185,.55)"
+      }));
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, w, h);
+      const ns = nodes, len = ns.length, dd = LINK_DIST * LINK_DIST;
+
+      ctx.lineWidth = 1;
+      for (let i = 0; i < len; i++) {
+        const a = ns[i];
+        for (let j = i + 1; j < len; j++) {
+          const b = ns[j];
+          const dx = a.x - b.x, dy = a.y - b.y;
+          const d2 = dx * dx + dy * dy;          // sem Math.hypot: evita sqrt
+          if (d2 < dd) {
+            const t = 1 - Math.sqrt(d2) / LINK_DIST;
+            ctx.strokeStyle = "rgba(0,180,160," + (0.13 * t).toFixed(3) + ")";
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+      for (let i = 0; i < len; i++) {
+        const p = ns[i];
+        ctx.fillStyle = p.col;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        p.x += p.vx; p.y += p.vy;
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+      }
+      raf = requestAnimationFrame(draw);
+    }
+
+    function start() { if (!running) { running = true; raf = requestAnimationFrame(draw); } }
+    function stop() { running = false; cancelAnimationFrame(raf); }
+
+    size(); build(); start();
+
+    let rt;
+    window.addEventListener("resize", () => {
+      clearTimeout(rt);
+      rt = setTimeout(() => { size(); build(); }, 180);
+    }, { passive: true });
+
+    // nao desenha com a aba em segundo plano
+    document.addEventListener("visibilitychange", () => {
+      document.hidden ? stop() : start();
+    });
+  } else if (canvas) {
+    canvas.style.display = "none";
   }
 
-  /* ---- nav condensa ao rolar ---- */
-  #nav { transition: padding 260ms ease, background-color 260ms ease; }
+  /* ------------------------------------------------------------------
+     2. GSAP
+  ------------------------------------------------------------------ */
+  if (typeof window.gsap === "undefined" || reduce) return;
+  const gsap = window.gsap;
+  gsap.registerPlugin(window.ScrollTrigger);
+  const ST = window.ScrollTrigger;
 
-  /* ---- alvos de animacao: visiveis por padrao ----
-     A opacidade so vai a zero se o GSAP carregar (classe .anim-ready no html).
-     Se o CDN falhar, a pagina continua legivel. */
-  .anim-ready [data-anim] { opacity: 0; }
+  clearTimeout(window.__animFailsafe);
+  document.documentElement.classList.add("anim-ready");
 
-  @media (prefers-reduced-motion: reduce) {
-    .anim-ready [data-anim] { opacity: 1 !important; transform: none !important; }
-    #progress { display: none; }
+  const EASE = "power2.out";
+
+  /* --- alvos de reveal ------------------------------------------------
+     Cada secao vira um grupo. Se um filho direto e um grid, quem anima
+     sao os cards dele (com stagger), nao o container. */
+  const targetsIn = section => Array.from(section.querySelectorAll("[data-anim]"));
+
+  const hero = document.getElementById("topo");
+
+  document.querySelectorAll("section, header").forEach(section => {
+    const targets = targetsIn(section);
+    if (!targets.length) return;
+
+    if (section === hero) return; // hero tem entrada propria, sem scroll
+
+    gsap.set(targets, { opacity: 0, y: 22 });
+    gsap.to(targets, {
+      opacity: 1, y: 0,
+      duration: 0.66, ease: EASE, stagger: 0.065,
+      scrollTrigger: { trigger: section, start: "top 80%", once: true }
+    });
+  });
+
+  /* --- entrada do hero: acontece no load, ninguem espera rolar ------- */
+  if (hero) {
+    const t = targetsIn(hero);
+    gsap.set(t, { opacity: 0, y: 26 });
+    gsap.to(t, { opacity: 1, y: 0, duration: 0.8, ease: EASE, stagger: 0.09, delay: 0.1 });
   }
 
-</style>
-<script>(function(){var d=document.documentElement;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('anim-ready');window.__animFailsafe=setTimeout(function(){d.classList.remove('anim-ready');},1500);})();</script></head>
-<body>
-<div aria-hidden="true" id="progress"></div>
-<div id="root" style="position: relative; min-height: 100vh; --acc: #00DA84;">
-<div aria-hidden="true" style="position: fixed; inset: 0; pointer-events: none; z-index: 0; background: radial-gradient(900px 600px at 12% -5%, rgba(0,218,132,.13), transparent 62%), radial-gradient(800px 620px at 88% 8%, rgba(97,0,255,.16), transparent 60%), radial-gradient(1100px 700px at 50% 105%, rgba(10,137,185,.12), transparent 65%);"></div>
-<canvas aria-hidden="true" id="fx" style="position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: .85;"></canvas>
-<div style="position: relative; z-index: 1;">
-<nav style="position: sticky; top: 0; z-index: 40; background: rgba(5,5,38,.82); backdrop-filter: blur(14px); border-bottom: 1px solid rgba(248,242,220,.10);">
-<div style="max-width: 1080px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 24px;">
-<a href="#topo" style="display: flex; align-items: center; gap: 10px; min-width: 0;">
-<img alt="AIfluence" height="128" src="assets/logo-aifluence.webp" style="width: 34px; height: 34px; border-radius: 8px; object-fit: cover; flex: none;" width="128"/>
-<span style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; letter-spacing: -.02em; color: #F8F2DC;">AIfluence</span>
-</a>
-<div style="display: flex; gap: 22px; margin-left: auto; align-items: center;">
-<div class="navlinks" style="gap: 22px;">
-<a href="#demonstracao" style="font-size: 15px; color: #BEB9A8;">Demonstração</a>
-<a href="#argumentos" style="font-size: 15px; color: #BEB9A8;">Por que funciona</a>
-<a href="#processo" style="font-size: 15px; color: #BEB9A8;">Implantação</a>
-<a href="#oferta" style="font-size: 15px; color: #BEB9A8;">Preço</a>
-<a href="#faq" style="font-size: 15px; color: #BEB9A8;">FAQ</a>
-</div>
-<a class="hv-acc" href="https://wa.me/559884046236?text=Vi%20a%20p%C3%A1gina%20da%20AIfluence%20e%20quero%20automatizar%20o%20atendimento%20do%20meu%20escrit%C3%B3rio" rel="noopener" style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 14px; color: #F8F2DC; border: 1px solid rgba(248,242,220,.18); padding: 10px 18px; border-radius: 999px; white-space: nowrap;" target="_blank">Falar agora</a>
-</div>
-</div>
-</nav>
-<header class="gr1" data-hero="1" id="topo" style="max-width: 1080px; margin: 0 auto; padding: 72px 24px 24px; display: grid; gap: 48px; align-items: center;">
-<div data-anim="">
-<div style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px; padding: 7px 14px 7px 12px; border: 1px solid rgba(248,242,220,.18); border-radius: 999px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--acc);">23H47 · DOMINGO</span>
-</div>
-<h1 style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: clamp(40px, 6.2vw, 68px); line-height: 1.06; letter-spacing: -.03em; margin: 0 0 24px; text-wrap: balance;">Você não perdeu o cliente para um advogado melhor. <span style="background: linear-gradient(90deg, #00DA84, #0A89B9); -webkit-background-clip: text; background-clip: text; color: transparent;">Perdeu para um que respondeu antes.</span></h1>
-<p style="font-size: 19px; line-height: 1.6; color: #BEB9A8; margin: 0 0 32px; max-width: 60ch; text-wrap: pretty;">Um agente de IA treinado com as teses e o tom do seu escritório atende, faz a triagem e qualifica cada lead no WhatsApp: às 3h da manhã, no domingo, durante a audiência. Você entra na conversa só quando já vale a pena entrar.</p>
-<div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: center;">
-<a class="hv-lift" href="https://wa.me/559884046236?text=Vi%20a%20p%C3%A1gina%20da%20AIfluence%20e%20quero%20automatizar%20o%20atendimento%20do%20meu%20escrit%C3%B3rio" rel="noopener" style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: #F8F2DC; background: #6100FF; padding: 15px 28px; border-radius: 999px; box-shadow: 0 0 40px rgba(97,0,255,.45); transition: transform 180ms;" target="_blank">Quero automatizar meu atendimento agora</a>
-</div>
-<p style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #7E7B70; margin: 16px 0 0;">Implantação personalizada · sem fidelidade · 7 dias de garantia</p>
-<div class="gr2" style="display: grid; gap: 16px; margin-top: 48px; padding-top: 32px; border-top: 1px solid rgba(248,242,220,.10);">
-<div>
-<div style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: -.03em; color: var(--acc);">Menos que 30s</div>
-<div style="font-size: 13.5px; color: #BEB9A8; line-height: 1.4; margin-top: 6px;">até a primeira resposta, a qualquer hora</div>
-</div>
-<div>
-<div data-count="" style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: -.03em; color: var(--acc);">720h</div>
-<div style="font-size: 13.5px; color: #BEB9A8; line-height: 1.4; margin-top: 6px;">de atendimento por mês, contra 176h de expediente</div>
-</div>
-<div>
-<div data-count="" style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: -.03em; color: var(--acc);">R$ 13,23</div>
-<div style="font-size: 13.5px; color: #BEB9A8; line-height: 1.4; margin-top: 6px;">custo por dia de operação</div>
-</div>
-<div>
-<div data-count="" style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: -.03em; color: var(--acc);">7 dias</div>
-<div style="font-size: 13.5px; color: #BEB9A8; line-height: 1.4; margin-top: 6px;">até o escritório estar no ar</div>
-</div>
-</div>
-</div>
-<div data-anim="" style="position: relative;">
-<div style="position: absolute; inset: -8% -6%; background: radial-gradient(60% 55% at 60% 30%, rgba(0,218,132,.16), transparent 70%); pointer-events: none;"></div>
-<div style="position: relative; background: #0B0B33; border: 1px solid rgba(248,242,220,.10); border-radius: 24px; padding: 24px; max-width: 420px; margin-left: auto; animation: acFloat 9s ease-in-out infinite;">
-<div style="display: flex; align-items: center; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid rgba(248,242,220,.10);">
-<div style="width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(150deg, #00DA84 0%, #00B79E 45%, #0A89B9 100%); flex: none;"></div>
-<div style="min-width: 0;">
-<div style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 14px;">Almeida &amp; Rocha Advogados</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--acc); letter-spacing: .06em;">online</div>
-</div>
-</div>
-<div style="display: flex; flex-direction: column; gap: 8px; padding-top: 16px;">
-<div style="background: rgba(0,218,132,.13); border: 1px solid rgba(0,218,132,.28); border-radius: 16px 16px 4px 16px; padding: 10px 14px; max-width: 92%; margin-left: auto;">
-<div style="font-size: 15px; line-height: 1.5; color: #F8F2DC;">Me conta um pouco sobre o que está acontecendo</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7E7B70; margin-top: 5px; text-align: right;">23:46</div>
-</div>
-<div style="background: #151545; border-radius: 16px 16px 16px 4px; padding: 10px 14px; max-width: 88%;">
-<div style="font-size: 15px; line-height: 1.5; color: #BEB9A8;">Eu fui demitido e trabalhava sem carteira assinada</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7E7B70; margin-top: 5px;">23:46</div>
-</div>
-<div style="background: rgba(0,218,132,.13); border: 1px solid rgba(0,218,132,.28); border-radius: 16px 16px 4px 16px; padding: 10px 14px; max-width: 92%; margin-left: auto;">
-<div style="font-size: 15px; line-height: 1.5; color: #F8F2DC;">Entendi sua situação. Casos como o seu são analisados com bastante cuidado aqui no escritório.</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7E7B70; margin-top: 5px; text-align: right;">23:46</div>
-</div>
-<div style="background: rgba(0,218,132,.13); border: 1px solid rgba(0,218,132,.28); border-radius: 16px 16px 4px 16px; padding: 10px 14px; max-width: 92%; margin-left: auto;">
-<div style="font-size: 15px; line-height: 1.5; color: #F8F2DC;">Qual foi o período que você trabalhou nessa empresa?</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7E7B70; margin-top: 5px; text-align: right;">23:48</div>
-</div>
-<div style="background: #151545; border-radius: 16px 16px 16px 4px; padding: 10px 12px; max-width: 88%; display: flex; align-items: center; gap: 10px;">
-<div style="width: 28px; height: 28px; border-radius: 50%; background: rgba(0,218,132,.18); display: flex; align-items: center; justify-content: center; flex: none;">
-<span style="width: 0; height: 0; border-left: 8px solid #00DA84; border-top: 5px solid transparent; border-bottom: 5px solid transparent; margin-left: 3px;"></span>
-</div>
-<div style="display: flex; align-items: center; gap: 2px; height: 20px; flex: 1; min-width: 0;"><span style="flex: 1; height: 7px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 11px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 5px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 14px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 9px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 17px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 6px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 13px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 20px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 8px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 15px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 10px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 18px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 7px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 12px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 16px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 6px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 11px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 14px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 9px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 5px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 13px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 8px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 16px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 7px; border-radius: 2px; background: rgba(190,185,168,.55);"></span><span style="flex: 1; height: 10px; border-radius: 2px; background: rgba(190,185,168,.55);"></span></div>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7E7B70; flex: none;">0:06 · 23:49</span>
-</div>
-<div style="background: rgba(0,218,132,.13); border: 1px solid rgba(0,218,132,.28); border-radius: 16px 16px 4px 16px; padding: 10px 14px; max-width: 92%; margin-left: auto;">
-<div style="font-size: 15px; line-height: 1.5; color: #F8F2DC;">Isso já é um tempo considerável</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7E7B70; margin-top: 5px; text-align: right;">23:49</div>
-</div>
-<div style="background: rgba(0,218,132,.13); border: 1px solid rgba(0,218,132,.28); border-radius: 16px 16px 4px 16px; padding: 10px 14px; max-width: 92%; margin-left: auto;">
-<div style="font-size: 15px; line-height: 1.5; color: #F8F2DC;">Agora me explique, por favor. Como era feito o pagamento do seu salário e qual era o valor mensal que vocês haviam combinado?</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7E7B70; margin-top: 5px; text-align: right;">23:53</div>
-</div>
-<div style="background: #151545; border-radius: 16px 16px 16px 4px; padding: 10px 14px; max-width: 46%;">
-<div style="font-size: 15px; line-height: 1.5; color: #BEB9A8;">Era no pix</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7E7B70; margin-top: 5px;">23:53</div>
-</div>
-<div style="background: #151545; border-radius: 16px 16px 16px 4px; padding: 10px 14px; max-width: 56%;">
-<div style="font-size: 15px; line-height: 1.5; color: #BEB9A8;">Recebia 3000 mensal</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #7E7B70; margin-top: 5px;">23:53</div>
-</div>
-</div>
-</div>
-<p style="max-width: 420px; margin: 16px 0 0 auto; font-size: 13.5px; line-height: 1.55; color: #BEB9A8; text-wrap: pretty;">Atendimento real da AIfluence, 23h46 de um domingo: a IA conduz a triagem, entende o áudio de 6 segundos e registra os valores. Às 8h o advogado acorda com o caso pronto para avaliar. O cliente falou com o escritório, não com a AIfluence.</p>
-</div>
-</header>
-<div style="margin: 48px 0; padding: 14px 0; border-top: 1px solid rgba(248,242,220,.10); border-bottom: 1px solid rgba(248,242,220,.10); overflow: hidden;">
-<div style="display: flex; width: max-content; animation: acMarquee 38s linear infinite;">
-<div style="display: flex; gap: 40px; padding-right: 40px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: #7E7B70; white-space: nowrap;">
-<span>API Oficial do WhatsApp</span><span style="color: var(--acc);">/</span><span>Triagem jurídica automática</span><span style="color: var(--acc);">/</span><span>Prompt escrito sob medida</span><span style="color: var(--acc);">/</span><span>Leitura de áudio e documento</span><span style="color: var(--acc);">/</span><span>Multiatendimento</span><span style="color: var(--acc);">/</span><span>Assinatura no chat</span><span style="color: var(--acc);">/</span><span>24 horas · 7 dias</span><span style="color: var(--acc);">/</span>
-</div>
-<div aria-hidden="true" style="display: flex; gap: 40px; padding-right: 40px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: #7E7B70; white-space: nowrap;">
-<span>API Oficial do WhatsApp</span><span style="color: var(--acc);">/</span><span>Triagem jurídica automática</span><span style="color: var(--acc);">/</span><span>Prompt escrito sob medida</span><span style="color: var(--acc);">/</span><span>Leitura de áudio e documento</span><span style="color: var(--acc);">/</span><span>Multiatendimento</span><span style="color: var(--acc);">/</span><span>Assinatura no chat</span><span style="color: var(--acc);">/</span><span>24 horas · 7 dias</span><span style="color: var(--acc);">/</span>
-</div>
-</div>
-</div>
-<section id="tese" style="max-width: 1080px; margin: 0 auto; padding: 64px 24px;">
-<div data-anim="" style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--acc);">21H08 · SEXTA</span>
-</div>
-<h2 data-anim="" style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: clamp(28px, 3.8vw, 42px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 20px; max-width: 22ch; text-wrap: balance;">O furo não está no marketing. Está entre a mensagem chegar e alguém responder.</h2>
-<p data-anim="" style="font-size: 19px; line-height: 1.65; color: #BEB9A8; max-width: 66ch; margin: 0 0 48px; text-wrap: pretty;">Nenhuma linha do seu extrato diz "contrato perdido por demora de 11 horas". Ele simplesmente nunca entrou. É a perda mais cara e mais invisível de um escritório.</p>
-<div class="gr3" style="display: grid; gap: 40px; align-items: center; background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 24px;">
-<div data-anim="">
-<div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 16px;">
-<div style="display: flex; align-items: center; gap: 8px;"><span style="width: 18px; height: 2px; background: #9B6BFF;"></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: #BEB9A8;">Leads que chegam</span></div>
-<div style="display: flex; align-items: center; gap: 8px;"><span style="width: 18px; height: 2px; background: var(--acc);"></span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase; color: #BEB9A8;">Leads respondidos hoje</span></div>
-</div>
-<svg aria-label="Gráfico: leads chegam durante todo o dia, mas só são respondidos das 9h às 18h" role="img" style="width: 100%; height: auto; display: block; overflow: visible;" viewbox="0 0 560 260">
-<line stroke="rgba(248,242,220,.18)" stroke-width="1" x1="40" x2="545" y1="220" y2="220"></line>
-<line stroke="rgba(248,242,220,.10)" stroke-width="1" x1="40" x2="40" y1="20" y2="220"></line>
-<rect fill="rgba(0,218,132,.05)" height="200" width="185" x="196" y="20"></rect>
-<polygon fill="rgba(155,107,255,.12)" points="40,150 110,120 180,96 250,74 320,64 390,92 460,70 545,110 545,220 460,220 390,220 320,220 250,66 180,86 110,220 40,220"></polygon>
-<polyline fill="none" points="40,150 110,120 180,96 250,74 320,64 390,92 460,70 545,110" stroke="#9B6BFF" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></polyline>
-<polyline fill="none" points="40,220 110,220 180,86 250,66 320,68 390,96 460,220 545,220" stroke="#00DA84" stroke-dasharray="1400" stroke-dashoffset="1400" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" style="animation: acDash 2.2s ease-out forwards;"></polyline>
-<text fill="#7E7B70" font-family="IBM Plex Mono, monospace" font-size="11" x="40" y="243">00h</text>
-<text fill="#7E7B70" font-family="IBM Plex Mono, monospace" font-size="11" x="196" y="243">09h</text>
-<text fill="#7E7B70" font-family="IBM Plex Mono, monospace" font-size="11" x="360" y="243">18h</text>
-<text fill="#7E7B70" font-family="IBM Plex Mono, monospace" font-size="11" x="505" y="243">23h59</text>
-<text fill="#9B6BFF" font-family="IBM Plex Mono, monospace" font-size="11.5" x="440" y="150">zona sem resposta</text>
-</svg>
-</div>
-<div data-anim="" style="display: flex; flex-direction: column; gap: 20px;">
-<div>
-<div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 6px;">A urgência não respeita expediente</div>
-<p style="font-size: 15px; line-height: 1.6; color: #BEB9A8; margin: 0;">Demissão, prisão em flagrante, acidente. O lead mais valioso chega no pior horário, e é o que fecha mais rápido.</p>
-</div>
-<div>
-<div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 6px;">Ele não avalia sua técnica</div>
-<p style="font-size: 15px; line-height: 1.6; color: #BEB9A8; margin: 0;">Avalia o que consegue medir: velocidade e organização. A disputa se decide antes da primeira reunião.</p>
-</div>
-<div>
-<div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin-bottom: 6px;">Ninguém conta o que se perde</div>
-<p style="font-size: 15px; line-height: 1.6; color: #BEB9A8; margin: 0;">Sem atendimento fora do horário, o escritório está descoberto em 76% das horas do mês.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="argumentos" style="max-width: 1080px; margin: 0 auto; padding: 64px 24px;">
-<div data-anim="" style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--acc);">03H12 · MADRUGADA</span>
-</div>
-<h2 data-anim="" style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: clamp(28px, 3.8vw, 42px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 48px; max-width: 24ch; text-wrap: balance;">Seis motivos pelos quais isso funciona em escritório de advocacia</h2>
-<div class="gr4" style="display: grid; gap: 20px;">
-<div class="hv-line" data-anim="" style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px;">
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -.02em; margin: 0;">Quem responde primeiro, fecha</h3>
-<p style="font-size: 16px; line-height: 1.55; color: #F8F2DC; margin: 0;">O cliente não escolhe o melhor advogado. Escolhe o que respondeu antes.</p>
-<p style="font-size: 15px; line-height: 1.65; color: #BEB9A8; margin: 0;">Ele não tem como avaliar sua técnica antes de contratar. Avalia velocidade e organização. A disputa se decide antes da primeira reunião.</p>
-<div style="margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(248,242,220,.10);">
-<div data-count="" style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 24px; color: var(--acc); letter-spacing: -.03em;">−90%</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #7E7B70;">no tempo até a 1ª resposta</div>
-</div>
-</div>
-<div class="hv-line" data-anim="" style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px;">
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -.02em; margin: 0;">O caso caro chega às 23h</h3>
-<p style="font-size: 16px; line-height: 1.55; color: #F8F2DC; margin: 0;">O lead mais valioso chega no pior horário.</p>
-<p style="font-size: 15px; line-height: 1.65; color: #BEB9A8; margin: 0;">Demissão, prisão em flagrante, acidente. A urgência não respeita expediente, e é justamente ela que fecha contrato rápido e com menos objeção de preço.</p>
-<div style="margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(248,242,220,.10);">
-<div data-count="" style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 24px; color: var(--acc); letter-spacing: -.03em;">720h</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #7E7B70;">cobertas por mês · 176h de expediente</div>
-</div>
-</div>
-<div class="hv-line" data-anim="" style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px;">
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -.02em; margin: 0;">Não é chatbot de menu</h3>
-<p style="font-size: 16px; line-height: 1.55; color: #F8F2DC; margin: 0;">É um agente que conversa.</p>
-<p style="font-size: 15px; line-height: 1.65; color: #BEB9A8; margin: 0;">"Digite 1 para trabalhista" queima reputação. Aqui o cliente escreve solto, manda áudio, fotografa a carteira de trabalho às 23h, e é entendido.</p>
-<div style="margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(248,242,220,.10);">
-<div data-count="" style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 24px; color: var(--acc); letter-spacing: -.03em;">0</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #7E7B70;">menus numerados</div>
-</div>
-</div>
-<div class="hv-line" data-anim="" style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px;">
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -.02em; margin: 0;">O prompt é escrito com você</h3>
-<p style="font-size: 16px; line-height: 1.55; color: #F8F2DC; margin: 0;">Construído com as suas teses, não comprado pronto.</p>
-<p style="font-size: 15px; line-height: 1.65; color: #BEB9A8; margin: 0;">Plataforma genérica entrega você para o painel. Aqui eu sento com você, mapeio o que precisa acontecer em cada atendimento e ajusto até responder como alguém do seu time.</p>
-<div style="margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(248,242,220,.10);">
-<div data-count="" style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 24px; color: var(--acc); letter-spacing: -.03em;">1 call</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #7E7B70;">para mapear seu atendimento</div>
-</div>
-</div>
-<div class="hv-line" data-anim="" style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px;">
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -.02em; margin: 0;">Seu número, seu histórico</h3>
-<p style="font-size: 16px; line-height: 1.55; color: #F8F2DC; margin: 0;">Roda na API Oficial da Meta.</p>
-<p style="font-size: 15px; line-height: 1.65; color: #BEB9A8; margin: 0;">Sem extensão de navegador, sem disparador pirata, sem risco de banimento. E se um dia você sair, o número e as conversas continuam sendo seus.</p>
-<div style="margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(248,242,220,.10);">
-<div style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 24px; color: var(--acc); letter-spacing: -.03em;">API oficial</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #7E7B70;">via BSP homologado pela Meta</div>
-</div>
-</div>
-<div class="hv-line" data-anim="" style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 12px;">
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -.02em; margin: 0;">Sem risco ético</h3>
-<p style="font-size: 16px; line-height: 1.55; color: #F8F2DC; margin: 0;">Sem consulta jurídica e sem captação ativa.</p>
-<p style="font-size: 15px; line-height: 1.65; color: #BEB9A8; margin: 0;">O agente acolhe, coleta e encaminha. Nunca opina sobre o mérito e nunca aborda ninguém. Responde quem procurou você, como faria uma secretária. A decisão jurídica continua exclusivamente sua.</p>
-<div style="margin-top: auto; padding-top: 12px; border-top: 1px solid rgba(248,242,220,.10);">
-<div style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 24px; color: var(--acc); letter-spacing: -.03em;">Recepção</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #7E7B70;">nunca captação</div>
-</div>
-</div>
-</div>
-</section>
-<div style="border-top: 1px solid rgba(248,242,220,.10); border-bottom: 1px solid rgba(248,242,220,.10); background: #050526;">
-<div style="max-width: 1080px; margin: 0 auto; padding: 56px 24px;">
-<p style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: clamp(22px, 2.9vw, 34px); line-height: 1.2; letter-spacing: -.025em; margin: 0; text-wrap: balance;">Enquanto o seu escritório dorme, o WhatsApp continua tocando. Só falta alguém do outro lado.</p>
-</div>
-</div>
-<section id="agora" style="max-width: 1080px; margin: 0 auto; padding: 64px 24px;">
-<div data-anim="" style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--acc);">13H05 · FERIADO</span>
-</div>
-<h2 data-anim="" style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: clamp(28px, 3.8vw, 42px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 40px; max-width: 20ch; text-wrap: balance;">Por que agora</h2>
-<div class="gr4" style="display: grid; gap: 20px;">
-<div data-anim="" style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 24px;">
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--acc); margin-bottom: 12px;">01</div>
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; margin: 0 0 10px;">A expectativa mudou</h3>
-<p style="font-size: 15px; line-height: 1.65; color: #BEB9A8; margin: 0;">Quem contrata advogado hoje espera resposta como espera de banco e delivery: em minutos, no WhatsApp. Silêncio de 11 horas virou sinal de escritório desorganizado.</p>
-</div>
-<div data-anim="" style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 24px;">
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--acc); margin-bottom: 12px;">02</div>
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; margin: 0 0 10px;">A tecnologia virou confiável</h3>
-<p style="font-size: 15px; line-height: 1.65; color: #BEB9A8; margin: 0;">A IA de 2023 travava fora do script. A de hoje entende áudio, mensagem quebrada e documento fotografado torto, sem parecer robô.</p>
-</div>
-<div data-anim="" style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 24px;">
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--acc); margin-bottom: 12px;">03</div>
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; margin: 0 0 10px;">A vantagem ainda está aberta</h3>
-<p style="font-size: 15px; line-height: 1.65; color: #BEB9A8; margin: 0;">Na sua cidade, quase nenhum escritório responde de madrugada. Quando todos responderem, isso deixa de ser diferencial e passa a ser o mínimo.</p>
-</div>
-</div>
-</section>
-<section id="demonstracao" style="max-width: 1080px; margin: 0 auto; padding: 64px 24px;">
-<div data-anim="" style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--acc);">02H41 · QUARTA</span>
-</div>
-<h2 data-anim="" style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: clamp(28px, 3.8vw, 42px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 40px; max-width: 24ch; text-wrap: balance;">O que muda na operação, medido em horas</h2>
-<div class="gr5" style="display: grid; gap: 20px;">
-<div data-anim="" style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 24px;">
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: #7E7B70; margin-bottom: 20px;">Antes</div>
-<div style="display: flex; flex-direction: column; gap: 18px;">
-<div>
-<div style="display: flex; justify-content: space-between; font-size: 14px; color: #BEB9A8; margin-bottom: 8px;"><span>Tempo até 1ª resposta</span><span style="font-family: 'IBM Plex Mono', monospace; color: #F8F2DC;">até 11h</span></div>
-<div style="height: 8px; border-radius: 999px; background: #151545;"><div style="height: 8px; width: 92%; border-radius: 999px; background: #7E7B70; animation: acBar 1.4s ease-out;"></div></div>
-</div>
-<div>
-<div style="display: flex; justify-content: space-between; font-size: 14px; color: #BEB9A8; margin-bottom: 8px;"><span>Horas cobertas por mês</span><span style="font-family: 'IBM Plex Mono', monospace; color: #F8F2DC;">176h</span></div>
-<div style="height: 8px; border-radius: 999px; background: #151545;"><div style="height: 8px; width: 24%; border-radius: 999px; background: #7E7B70; animation: acBar 1.4s ease-out;"></div></div>
-</div>
-<div>
-<div style="display: flex; justify-content: space-between; font-size: 14px; color: #BEB9A8; margin-bottom: 8px;"><span>Lead qualificado antes da call</span><span style="font-family: 'IBM Plex Mono', monospace; color: #F8F2DC;">manual</span></div>
-<div style="height: 8px; border-radius: 999px; background: #151545;"><div style="height: 8px; width: 18%; border-radius: 999px; background: #7E7B70; animation: acBar 1.4s ease-out;"></div></div>
-</div>
-</div>
-</div>
-<div data-anim="" style="position: relative; background: linear-gradient(180deg, #0B0B33, #00001E); border: 1px solid rgba(248,242,220,.18); border-radius: 16px; padding: 24px; overflow: hidden;">
-<div style="position: absolute; inset: 0; background: radial-gradient(70% 60% at 80% 0%, rgba(0,218,132,.12), transparent 70%); pointer-events: none;"></div>
-<div style="position: relative;">
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: var(--acc); margin-bottom: 20px;">Depois</div>
-<div style="display: flex; flex-direction: column; gap: 18px;">
-<div>
-<div style="display: flex; justify-content: space-between; font-size: 14px; color: #BEB9A8; margin-bottom: 8px;"><span>Tempo até 1ª resposta</span><span style="font-family: 'IBM Plex Mono', monospace; color: #F8F2DC;">Menos que 30s</span></div>
-<div style="height: 8px; border-radius: 999px; background: #151545;"><div style="height: 8px; width: 6%; border-radius: 999px; background: linear-gradient(90deg, #00DA84, #0A89B9); animation: acBar 1.4s ease-out;"></div></div>
-</div>
-<div>
-<div style="display: flex; justify-content: space-between; font-size: 14px; color: #BEB9A8; margin-bottom: 8px;"><span>Horas cobertas por mês</span><span style="font-family: 'IBM Plex Mono', monospace; color: #F8F2DC;">720h</span></div>
-<div style="height: 8px; border-radius: 999px; background: #151545;"><div style="height: 8px; width: 100%; border-radius: 999px; background: linear-gradient(90deg, #00DA84, #0A89B9); animation: acBar 1.4s ease-out;"></div></div>
-</div>
-<div>
-<div style="display: flex; justify-content: space-between; font-size: 14px; color: #BEB9A8; margin-bottom: 8px;"><span>Lead qualificado antes da call</span><span style="font-family: 'IBM Plex Mono', monospace; color: #F8F2DC;">automático</span></div>
-<div style="height: 8px; border-radius: 999px; background: #151545;"><div style="height: 8px; width: 96%; border-radius: 999px; background: linear-gradient(90deg, #00DA84, #0A89B9); animation: acBar 1.4s ease-out;"></div></div>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="gr6" style="display: grid; gap: 20px; margin-top: 20px; align-items: start;">
-<div data-anim="" style="background: #0B0B33; border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 16px;">
-<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
-<span style="display: flex; gap: 5px;"><span style="width: 9px; height: 9px; border-radius: 50%; background: #7E7B70;"></span><span style="width: 9px; height: 9px; border-radius: 50%; background: #7E7B70;"></span><span style="width: 9px; height: 9px; border-radius: 50%; background: #7E7B70;"></span></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #BEB9A8;">Painel de atendimento · operação real</span>
-</div>
-<div style="position: relative; border-radius: 10px; overflow: hidden; border: 1px solid rgba(248,242,220,.10);">
-<img alt="Painel de atendimento da AIfluence: conversa em triagem, fila de atendimentos, etapa do CRM e agente atribuído" decoding="async" height="758" loading="lazy" src="assets/print-painel-2.webp" style="width: 100%; height: auto; display: block;" width="1600"/>
-<div aria-hidden="true" style="position: absolute; left: 3.4%; top: 24.6%; width: 24.3%; bottom: 0; backdrop-filter: blur(8px); background: rgba(0,0,30,.14);"></div>
-<div aria-hidden="true" style="position: absolute; left: 80.4%; top: 22.2%; width: 19%; height: 7.4%; backdrop-filter: blur(8px); background: rgba(0,0,30,.14);"></div>
-</div>
-<p style="font-size: 14px; line-height: 1.6; color: #BEB9A8; margin: 14px 0 0;">A mesma conversa do topo, vista por dentro: a triagem rodando às 23h, a etapa do CRM e o agente atribuído. As outras conversas da fila estão desfocadas por sigilo.</p>
-</div>
-<div data-anim="" style="background: #0B0B33; border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 16px;">
-<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #BEB9A8;">Atendimento real</span>
-</div>
-<div class="gr7" style="display: grid; gap: 28px; align-items: center;">
-<div style="border-radius: 20px; overflow: hidden; border: 1px solid rgba(248,242,220,.10); max-width: 320px; width: 100%; justify-self: center;">
-<img alt="Conversa real no WhatsApp: a IA acolhe o caso trabalhista, registra os dados e encaminha ao advogado" decoding="async" height="1280" loading="lazy" src="assets/print-whatsapp-anon.webp" style="width: 100%; height: auto; display: block;" width="589"/>
-</div>
-<div>
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -.02em; margin: 0 0 12px;">Uma conversa real, do primeiro "oi" ao caso registrado</h3>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0 0 12px; max-width: 52ch;">Acolhe o cliente, explica em português o que pode existir de direito, coleta nome, cidade e histórico, e encerra encaminhando para o advogado, sem opinar sobre o mérito e sem prometer resultado.</p>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0; max-width: 52ch;">Repare no relógio: nove da manhã ou três da madrugada, o atendimento é o mesmo.</p>
-</div>
-</div>
-</div>
-<div data-anim="" style="background: #0B0B33; border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 16px;">
-<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: #BEB9A8;">Aviso ao escritório</span>
-</div>
-<div class="gr7" style="display: grid; gap: 28px; align-items: center;">
-<div style="border-radius: 20px; overflow: hidden; border: 1px solid rgba(248,242,220,.10); max-width: 320px; width: 100%; justify-self: center;">
-<img alt="Notificação recebida pelo escritório: card com nome, cidade, área provável e resumo do caso, com link para a conversa" decoding="async" height="768" loading="lazy" src="assets/print-telegram-lead.webp" style="width: 100%; height: auto; display: block;" width="589"/>
-</div>
-<div>
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; line-height: 1.2; letter-spacing: -.02em; margin: 0 0 12px;">O caso chega resumido, antes de você abrir a conversa</h3>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0 0 12px; max-width: 52ch;">Terminada a triagem, o escritório recebe um aviso com nome, cidade, área provável e o resumo do caso em poucas linhas, mais o link direto para a conversa inteira quando você quiser conferir.</p>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0; max-width: 52ch;">Você decide se vale a pena entrar lendo cinco linhas, não rolando cem mensagens.</p>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="servico" style="max-width: 1080px; margin: 0 auto; padding: 64px 24px;">
-<div data-anim="" style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--acc);">20H22 · SÁBADO</span>
-</div>
-<div class="gr8" style="display: grid; gap: 48px;">
-<div data-anim="">
-<h2 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: clamp(28px, 3.8vw, 42px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 20px; text-wrap: balance;">Não é um chatbot alugado. É atendimento construído para o seu escritório.</h2>
-<p style="font-size: 19px; line-height: 1.65; color: #BEB9A8; margin: 0 0 16px; max-width: 66ch; text-wrap: pretty;">A diferença entre uma IA que vende e uma IA que constrange o escritório está inteira no prompt. Chatbot genérico segue script e trava no primeiro caso fora do padrão.</p>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0 0 24px; max-width: 66ch; text-wrap: pretty;">O que a AIfluence implanta é escrito sobre prompts jurídicos validados em operação real, não copiados de template. Na prática: a IA distingue um caso trabalhista urgente de alguém pedindo orientação gratuita, e fala como o seu escritório fala.</p>
-<div style="display: flex; flex-wrap: wrap; gap: 10px;">
-<span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(248,242,220,.10); border-radius: 999px; padding: 8px 15px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .05em; color: #BEB9A8;"><span style="width: 5px; height: 5px; border-radius: 50%; background: var(--acc);"></span>API Oficial do WhatsApp (Meta)</span>
-<span style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgba(248,242,220,.10); border-radius: 999px; padding: 8px 15px; font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .05em; color: #BEB9A8;"><span style="width: 5px; height: 5px; border-radius: 50%; background: var(--acc);"></span>Integração ZapSign</span>
-</div>
-</div>
-<div class="gr9" data-anim="" style="display: grid; gap: 20px;">
-<div style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 20px;">
-<svg aria-hidden="true" height="26" style="margin-bottom: 12px;" viewbox="0 0 26 26" width="26"><circle cx="13" cy="13" fill="none" r="11" stroke="#00DA84" stroke-width="1.6"></circle><circle cx="13" cy="13" fill="#00DA84" r="3.5"></circle></svg>
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin: 0 0 6px;">Triagem e qualificação</h3>
-<p style="font-size: 15px; line-height: 1.6; color: #BEB9A8; margin: 0;">Identifica área, urgência e se o caso encaixa nos seus critérios de aceite.</p>
-</div>
-<div style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 20px;">
-<svg aria-hidden="true" height="26" style="margin-bottom: 12px;" viewbox="0 0 26 26" width="26"><rect fill="none" height="20" rx="4" stroke="#0A89B9" stroke-width="1.6" width="20" x="3" y="3"></rect><rect fill="#0A89B9" height="2" width="10" x="8" y="8"></rect><rect fill="#0A89B9" height="2" width="7" x="8" y="13"></rect></svg>
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin: 0 0 6px;">Leitura de documentos</h3>
-<p style="font-size: 15px; line-height: 1.6; color: #BEB9A8; margin: 0;">Recebe foto, PDF e áudio, confere o que falta e pede de novo. O caso não morre na triagem.</p>
-</div>
-<div style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 20px;">
-<svg aria-hidden="true" height="26" style="margin-bottom: 12px;" viewbox="0 0 26 26" width="26"><rect fill="none" height="15.5" stroke="#9B6BFF" stroke-width="1.6" transform="rotate(45 13 2)" width="15.5" x="13" y="2"></rect></svg>
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin: 0 0 6px;">Multiatendimento</h3>
-<p style="font-size: 15px; line-height: 1.6; color: #BEB9A8; margin: 0;">Sócio, associado e secretária no mesmo número, sem transferir cliente de linha em linha.</p>
-</div>
-<div style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 20px;">
-<svg aria-hidden="true" height="26" style="margin-bottom: 12px;" viewbox="0 0 26 26" width="26"><circle cx="8" cy="8" fill="none" r="4" stroke="#00DA84" stroke-width="1.6"></circle><circle cx="18" cy="18" fill="none" r="4" stroke="#0A89B9" stroke-width="1.6"></circle><line stroke="#00B79E" stroke-width="1.6" x1="11" x2="15" y1="11" y2="15"></line></svg>
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin: 0 0 6px;">Assinatura no chat</h3>
-<p style="font-size: 15px; line-height: 1.6; color: #BEB9A8; margin: 0;">Contrato com validade jurídica via ZapSign, sem tirar o cliente da conversa.</p>
-</div>
-<div style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 20px;">
-<svg aria-hidden="true" height="26" style="margin-bottom: 12px;" viewbox="0 0 26 26" width="26"><rect fill="none" height="18" rx="9" stroke="#00DA84" stroke-width="1.6" width="18" x="4" y="4"></rect><rect fill="#00DA84" height="6" width="2" x="12" y="8"></rect><rect fill="#00DA84" height="2" width="5" x="12" y="13"></rect></svg>
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin: 0 0 6px;">Notificação de caso quente</h3>
-<p style="font-size: 15px; line-height: 1.6; color: #BEB9A8; margin: 0;">Você é avisado quando a conversa pede um advogado, e assume quando quiser.</p>
-</div>
-<div style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 20px;">
-<svg aria-hidden="true" height="26" style="margin-bottom: 12px;" viewbox="0 0 26 26" width="26"><circle cx="13" cy="13" fill="none" r="11" stroke="#0A89B9" stroke-width="1.6"></circle><rect fill="#0A89B9" height="8" width="2" x="12" y="6"></rect><rect fill="#0A89B9" height="2" width="7" x="12" y="12"></rect></svg>
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; margin: 0 0 6px;">Ajuste contínuo de prompt</h3>
-<p style="font-size: 15px; line-height: 1.6; color: #BEB9A8; margin: 0;">Acompanhamento e refinamento durante o primeiro mês, com você aprovando o tom.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="processo" style="max-width: 1080px; margin: 0 auto; padding: 64px 24px;">
-<div data-anim="" style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--acc);">06H30 · SEGUNDA</span>
-</div>
-<h2 data-anim="" style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: clamp(28px, 3.8vw, 42px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 48px; max-width: 22ch; text-wrap: balance;">Três etapas até o escritório atender sozinho</h2>
-<div data-anim="" style="display: flex; flex-direction: column; gap: 0;">
-<div class="gr10" style="display: grid; gap: 24px; padding-bottom: 40px; border-left: 1px solid rgba(248,242,220,.10); margin-left: 20px; padding-left: 32px; position: relative;">
-<div style="position: absolute; left: -21px; top: 0; width: 40px; height: 40px; border-radius: 50%; background: #0B0B33; border: 1px solid rgba(248,242,220,.18); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--acc);">01</div>
-<div style="grid-column: 1 / -1;">
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; margin: 0 0 8px;">Conexão</h3>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0; max-width: 66ch;">Ligamos o número do seu escritório à API Oficial da Meta, com segurança e sem risco de banimento. Seu histórico continua seu.</p>
-</div>
-</div>
-<div class="gr10" style="display: grid; gap: 24px; padding-bottom: 40px; border-left: 1px solid rgba(248,242,220,.10); margin-left: 20px; padding-left: 32px; position: relative;">
-<div style="position: absolute; left: -21px; top: 0; width: 40px; height: 40px; border-radius: 50%; background: #0B0B33; border: 1px solid rgba(248,242,220,.18); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--acc);">02</div>
-<div style="grid-column: 1 / -1;">
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; margin: 0 0 8px;">Construção do prompt</h3>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0; max-width: 66ch;">Uma call para mapear suas áreas, o que caracteriza um caso viável, as perguntas de triagem que importam, o que o agente nunca pode dizer e o tom do escritório. Eu escrevo e testo o prompt, e você aprova antes de qualquer cliente ver.</p>
-</div>
-</div>
-<div class="gr10" style="display: grid; gap: 24px; margin-left: 20px; padding-left: 32px; position: relative;">
-<div style="position: absolute; left: -21px; top: 0; width: 40px; height: 40px; border-radius: 50%; background: #0B0B33; border: 1px solid rgba(248,242,220,.18); display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: var(--acc);">03</div>
-<div style="grid-column: 1 / -1;">
-<h3 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 22px; margin: 0 0 8px;">Treinamento</h3>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0; max-width: 66ch;">Você e sua equipe aprendem a usar a plataforma, acompanhar os atendimentos e assumir a conversa quando quiserem.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="oferta" style="max-width: 1080px; margin: 0 auto; padding: 64px 24px;">
-<div data-anim="" style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--acc);">00H09 · DOMINGO</span>
-</div>
-<h2 data-anim="" style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: clamp(28px, 3.8vw, 42px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 40px; max-width: 24ch; text-wrap: balance;">Tudo o que entra quando a AIfluence assume o atendimento</h2>
-<div class="gr11" style="display: grid; gap: 24px; align-items: start;">
-<div data-anim="" style="background: linear-gradient(180deg, #050526, #00001E); border: 1px solid rgba(248,242,220,.10); border-radius: 16px; padding: 8px 24px;">
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: #7E7B70; padding: 14px 0 2px;">Referência de mercado · item a item</div>
-<div style="display: flex; justify-content: space-between; gap: 20px; padding: 16px 0; border-bottom: 1px solid rgba(248,242,220,.10); font-size: 16px;"><span>Atendimento com IA 24/7 no WhatsApp Oficial do escritório</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #7E7B70; white-space: nowrap;">R$ 590</span></div>
-<div style="display: flex; justify-content: space-between; gap: 20px; padding: 16px 0; border-bottom: 1px solid rgba(248,242,220,.10); font-size: 16px;"><span>Implantação personalizada: prompt escrito para a sua área e o seu tom</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #7E7B70; white-space: nowrap;">R$ 490</span></div>
-<div style="display: flex; justify-content: space-between; gap: 20px; padding: 16px 0; border-bottom: 1px solid rgba(248,242,220,.10); font-size: 16px;"><span>Triagem e qualificação automática de todo lead</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #7E7B70; white-space: nowrap;">R$ 290</span></div>
-<div style="display: flex; justify-content: space-between; gap: 20px; padding: 16px 0; border-bottom: 1px solid rgba(248,242,220,.10); font-size: 16px;"><span>Multiatendimento: escritório inteiro no mesmo número</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #7E7B70; white-space: nowrap;">R$ 190</span></div>
-<div style="display: flex; justify-content: space-between; gap: 20px; padding: 16px 0; border-bottom: 1px solid rgba(248,242,220,.10); font-size: 16px;"><span>Leitura de documentos, fotos e áudios na conversa</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #7E7B70; white-space: nowrap;">R$ 150</span></div>
-<div style="display: flex; justify-content: space-between; gap: 20px; padding: 16px 0; border-bottom: 1px solid rgba(248,242,220,.10); font-size: 16px;"><span>Integração ZapSign: contrato assinado dentro do WhatsApp</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #7E7B70; white-space: nowrap;">R$ 120</span></div>
-<div style="display: flex; justify-content: space-between; gap: 20px; padding: 16px 0; border-bottom: 1px solid rgba(248,242,220,.10); font-size: 16px;"><span>API Oficial da Meta: número protegido, sem risco de banimento</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #7E7B70; white-space: nowrap;">R$ 90</span></div>
-<div style="display: flex; justify-content: space-between; gap: 20px; padding: 16px 0; border-bottom: 1px solid rgba(248,242,220,.10); font-size: 16px;"><span>Acompanhamento e ajustes de prompt</span><span style="font-family: 'IBM Plex Mono', monospace; font-size: 13px; color: #7E7B70; white-space: nowrap;">R$ 65</span></div>
-<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 20px; padding: 24px 0 18px; font-size: 16px;"><span style="font-family: 'Sora', sans-serif; font-weight: 600; color: #BEB9A8;">Somando item a item</span><span style="display: inline-flex; align-items: baseline; gap: 6px; white-space: nowrap;"><span style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 40px; letter-spacing: -.035em; line-height: 1; color: #F8F2DC; text-decoration: line-through; text-decoration-thickness: 3px; text-decoration-color: rgba(248,242,220,.55);">R$ 1.985</span><span style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 16px; color: #BEB9A8;">/mês</span></span></div>
-</div>
-<div data-anim="" style="position: relative; background: linear-gradient(180deg, #0B0B33, #00001E); border: 1px solid rgba(248,242,220,.18); border-radius: 24px; padding: 32px; overflow: hidden;">
-<div style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, #00DA84, #0A89B9);"></div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .18em; text-transform: uppercase; color: #7E7B70; margin-bottom: 12px;">Assinatura mensal</div>
-<div style="display: flex; align-items: baseline; gap: 8px;">
-<span style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: 56px; letter-spacing: -.04em; line-height: 1;">R$ 397</span>
-<span style="font-family: 'Sora', sans-serif; font-weight: 600; font-size: 18px; color: #BEB9A8;">/mês</span>
-</div>
-<p style="font-size: 13.5px; line-height: 1.6; color: #BEB9A8; margin: 14px 0 0;">São <span style="color: #F8F2DC;">R$ 13,23 por dia</span>, menos que o estacionamento do fórum. Uma secretária custa várias vezes isso com encargos e cobre 176h por mês; a AIfluence cobre as 720h.</p>
-<p style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .06em; color: var(--acc); margin: 14px 0 0;">Preço de lançamento, travado enquanto você for cliente.</p>
-<a class="hv-lift" href="https://wa.me/559884046236?text=Vi%20a%20p%C3%A1gina%20da%20AIfluence%20e%20quero%20automatizar%20o%20atendimento%20do%20meu%20escrit%C3%B3rio" rel="noopener" style="display: block; text-align: center; margin-top: 22px; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: #F8F2DC; background: #6100FF; padding: 15px 24px; border-radius: 999px; box-shadow: 0 0 40px rgba(97,0,255,.45); transition: transform 180ms;" target="_blank">Quero automatizar meu atendimento agora</a>
-<p style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #7E7B70; margin: 12px 0 0; text-align: center;">Sem fidelidade · 7 dias de garantia</p>
-</div>
-</div>
-</section>
-<section id="quem" style="max-width: 1080px; margin: 0 auto; padding: 64px 24px;">
-<div data-anim="" style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--acc);">19H40 · SÁBADO</span>
-</div>
-<div class="gr12" style="display: grid; gap: 40px; align-items: center;">
-<div data-anim="" style="position: relative; border-radius: 24px; overflow: hidden; border: 1px solid rgba(248,242,220,.10);">
-<img alt="Felipe Mondego" decoding="async" height="960" loading="lazy" src="assets/felipe.webp" style="width: 100%; height: auto; display: block;" width="720"/>
-<div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,30,0) 45%, rgba(0,0,30,.85) 100%);"></div>
-<div style="position: absolute; bottom: 16px; left: 16px; right: 16px;">
-<div style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px;">Felipe Mondego</div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--acc); margin-top: 4px;">Engenheiro de prompt · gestor de automação</div>
-</div>
-</div>
-<div data-anim="">
-<h2 style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: clamp(28px, 3.8vw, 42px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 20px; text-wrap: balance;">Quem escreve o prompt do seu escritório sou eu</h2>
-<p style="font-size: 17px; line-height: 1.65; color: #BEB9A8; margin: 0 0 14px; max-width: 66ch; text-wrap: pretty;">Passei um ano e meio dentro de uma operação de IA jurídica, construindo e ajustando os agentes que atendem no WhatsApp de escritórios de advocacia. Meu trabalho era exatamente esse: fazer a IA entender caso jurídico, qualificar lead e não passar vergonha na frente do cliente do escritório.</p>
-<p style="font-size: 17px; line-height: 1.65; color: #BEB9A8; margin: 0; max-width: 66ch; text-wrap: pretty;">A AIfluence nasceu do que aprendi ali, e do que eu faria diferente. Aqui não tem template comprado nem chamado de suporte nível 1: você fala com quem escreveu o sistema.</p>
-</div>
-</div>
-</section>
-<section id="faq" style="max-width: 1080px; margin: 0 auto; padding: 64px 24px;">
-<div data-anim="" style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--acc);">22H14 · QUINTA</span>
-</div>
-<h2 data-anim="" style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: clamp(28px, 3.8vw, 42px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 40px; text-wrap: balance;">As perguntas que todo advogado faz</h2>
-<div data-anim="" style="max-width: 800px;">
-<details style="border-top: 1px solid rgba(248,242,220,.10);">
-<summary style="display: flex; justify-content: space-between; gap: 20px; padding: 20px 0; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: #F8F2DC;"><span>Meu cliente vai perceber que é robô?</span><span style="color: var(--acc); flex: none;">+</span></summary>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0 0 20px; max-width: 66ch;">Vai perceber se for um robô mal feito. Não há menu numerado aqui: o agente conversa, entende contexto, responde áudio e escreve no tom que você aprovar, e você valida as respostas antes de o atendimento ir ao ar. O cliente estranha muito mais ficar 11 horas sem resposta.</p>
-</details>
-<details style="border-top: 1px solid rgba(248,242,220,.10);">
-<summary style="display: flex; justify-content: space-between; gap: 20px; padding: 20px 0; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: #F8F2DC;"><span>Isso é permitido pela OAB?</span><span style="color: var(--acc); flex: none;">+</span></summary>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0 0 20px; max-width: 66ch;">O agente não capta cliente, não mercantiliza a profissão e não promete resultado. Ele faz o que a secretária já faz: recebe quem procurou o escritório, organiza a informação e agenda. A orientação jurídica continua exclusivamente sua, com travas de linguagem escritas no prompt.</p>
-</details>
-<details style="border-top: 1px solid rgba(248,242,220,.10);">
-<summary style="display: flex; justify-content: space-between; gap: 20px; padding: 20px 0; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: #F8F2DC;"><span>E o sigilo profissional e a LGPD?</span><span style="color: var(--acc); flex: none;">+</span></summary>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0 0 20px; max-width: 66ch;">O que o seu cliente escreve fica no ambiente do seu escritório: não é vendido, não é compartilhado com terceiros e não treina modelo de ninguém. A operação roda na infraestrutura oficial da Meta. Antes de assinar qualquer coisa, eu te mando a documentação técnica.</p>
-</details>
-<details style="border-top: 1px solid rgba(248,242,220,.10);">
-<summary style="display: flex; justify-content: space-between; gap: 20px; padding: 20px 0; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: #F8F2DC;"><span>Quanto tempo até estar no ar? Funciona na minha área?</span><span style="color: var(--acc); flex: none;">+</span></summary>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0 0 20px; max-width: 66ch;">Alguns dias, dependendo dos ajustes de prompt. Zero conhecimento técnico da sua parte. Trabalhista, previdenciário, família, cível, criminal, tributário, empresarial: a triagem é escrita sob medida para as áreas que você atende e os casos que você aceita.</p>
-</details>
-<details style="border-top: 1px solid rgba(248,242,220,.10);">
-<summary style="display: flex; justify-content: space-between; gap: 20px; padding: 20px 0; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: #F8F2DC;"><span>E se eu quiser assumir a conversa?</span><span style="color: var(--acc); flex: none;">+</span></summary>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0 0 20px; max-width: 66ch;">É só entrar. Você assume a qualquer momento e a IA sai de cena naquela conversa, e ela te avisa quando identifica um atendimento quente. Ela não substitui sua equipe: cuida da triagem e do fora de horário para que vocês foquem em quem já está qualificado.</p>
-</details>
-<details style="border-top: 1px solid rgba(248,242,220,.10); border-bottom: 1px solid rgba(248,242,220,.10);">
-<summary style="display: flex; justify-content: space-between; gap: 20px; padding: 20px 0; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 18px; color: #F8F2DC;"><span>Tem fidelidade ou multa de cancelamento?</span><span style="color: var(--acc); flex: none;">+</span></summary>
-<p style="font-size: 16px; line-height: 1.65; color: #BEB9A8; margin: 0 0 20px; max-width: 66ch;">Nenhuma. É mensal: cancelou, para no fim do ciclo. Sem multa, sem carência, sem letra miúda, e com 7 dias de garantia no início.</p>
-</details>
-</div>
-</section>
-<section style="max-width: 1080px; margin: 0 auto; padding: 64px 24px 96px;">
-<div data-anim="" style="position: relative; background: linear-gradient(180deg, #0B0B33, #00001E); border: 1px solid rgba(248,242,220,.18); border-radius: 24px; padding: 64px 32px; text-align: center; overflow: hidden;">
-<div style="position: absolute; inset: -40% -10% auto; height: 320px; background: radial-gradient(50% 60% at 50% 50%, rgba(97,0,255,.28), transparent 70%); pointer-events: none;"></div>
-<div style="position: relative;">
-<div style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px;">
-<span style="width: 7px; height: 7px; border-radius: 50%; background: var(--acc); animation: acDot 2.4s infinite;"></span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; letter-spacing: .18em; text-transform: uppercase; color: var(--acc);">03H27 · HOJE</span>
-</div>
-<h2 style="font-family: 'Sora', sans-serif; font-weight: 800; font-size: clamp(30px, 4.6vw, 50px); line-height: 1.1; letter-spacing: -.03em; margin: 0 auto 20px; max-width: 24ch; text-wrap: balance;">Você vai receber leads hoje à noite de qualquer jeito. A pergunta é se alguém vai responder.</h2>
-<p style="font-size: 18px; line-height: 1.65; color: #BEB9A8; margin: 0 auto 32px; max-width: 60ch; text-wrap: pretty;">Todo dia sem atendimento fora do horário é um dia em que alguém te procurou, não teve resposta e chamou o próximo. Você nunca vai saber o nome dessa pessoa, só vai sentir no faturamento.</p>
-<a class="hv-lift" href="https://wa.me/559884046236?text=Vi%20a%20p%C3%A1gina%20da%20AIfluence%20e%20quero%20automatizar%20o%20atendimento%20do%20meu%20escrit%C3%B3rio" rel="noopener" style="display: inline-block; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px; color: #F8F2DC; background: #6100FF; padding: 17px 32px; border-radius: 999px; box-shadow: 0 0 40px rgba(97,0,255,.45); transition: transform 180ms;" target="_blank">Quero automatizar meu atendimento agora</a>
-<p style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: #7E7B70; margin: 16px 0 0;">R$ 13 por dia · sem fidelidade · 7 dias de garantia</p>
-</div>
-</div>
-</section>
-<footer style="border-top: 1px solid rgba(248,242,220,.10); background: #050526;">
-<div class="gr13" style="max-width: 1080px; margin: 0 auto; padding: 48px 24px; display: grid; gap: 32px;">
-<div>
-<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 14px;">
-<img alt="AIfluence" height="128" src="assets/logo-aifluence.webp" style="width: 32px; height: 32px; border-radius: 8px; object-fit: cover;" width="128"/>
-<span style="font-family: 'Sora', sans-serif; font-weight: 700; font-size: 17px;">AIfluence</span>
-</div>
-<p style="font-size: 15px; line-height: 1.6; color: #BEB9A8; margin: 0; max-width: 34ch;">A inteligência é nossa, a identidade é sua. Atendimento com IA dentro do WhatsApp do seu escritório.</p>
-</div>
-<div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #7E7B70; margin-bottom: 14px;">Página</div>
-<div style="display: flex; flex-direction: column; gap: 10px;">
-<a href="#demonstracao" style="font-size: 15px; color: #BEB9A8;">Demonstração</a>
-<a href="#servico" style="font-size: 15px; color: #BEB9A8;">O serviço</a>
-<a href="#processo" style="font-size: 15px; color: #BEB9A8;">Implantação</a>
-<a href="#oferta" style="font-size: 15px; color: #BEB9A8;">Preço</a>
-</div>
-</div>
-<div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #7E7B70; margin-bottom: 14px;">Contato</div>
-<div style="display: flex; flex-direction: column; gap: 10px;">
-<a href="https://wa.me/559884046236?text=Vi%20a%20p%C3%A1gina%20da%20AIfluence%20e%20quero%20automatizar%20o%20atendimento%20do%20meu%20escrit%C3%B3rio" rel="noopener" style="font-size: 15px; color: #BEB9A8;" target="_blank">WhatsApp (98) 8404-6236</a>
-<a href="mailto:contato.aiflunce@gmail.com" style="font-size: 15px; color: #BEB9A8;">contato.aiflunce@gmail.com</a>
-<a href="https://instagram.com/aifluence.br" rel="noopener" style="font-size: 15px; color: #BEB9A8;" target="_blank">@aifluence.br</a>
-</div>
-</div>
-<div>
-<div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #7E7B70; margin-bottom: 14px;">Legal</div>
-<div style="display: flex; flex-direction: column; gap: 10px;">
-<a href="#" style="font-size: 15px; color: #BEB9A8;">[Política de privacidade]</a>
-<a href="#" style="font-size: 15px; color: #BEB9A8;">[Termos de uso]</a>
-</div>
-</div>
-</div>
-<div style="max-width: 1080px; margin: 0 auto; padding: 20px 24px 96px; border-top: 1px solid rgba(248,242,220,.10); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7E7B70;">© 2026 AIfluence. Todos os direitos reservados.</span>
-<span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #7E7B70;">Atendimento com IA para escritórios de advocacia</span>
-</div>
-</footer>
-</div>
-<div class="mobilebar" style="  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: rgba(5,5,38,.94); backdrop-filter: blur(14px); border-top: 1px solid rgba(248,242,220,.18);">
-<a href="https://wa.me/559884046236?text=Vi%20a%20p%C3%A1gina%20da%20AIfluence%20e%20quero%20automatizar%20o%20atendimento%20do%20meu%20escrit%C3%B3rio" rel="noopener" style="display: block; text-align: center; font-family: 'Sora', sans-serif; font-weight: 700; font-size: 16px; color: #F8F2DC; background: #6100FF; padding: 15px 20px; border-radius: 999px;" target="_blank">Quero automatizar meu atendimento</a>
-</div>
-</div>
-<script defer="" src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-<script defer="" src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-<script defer="" src="./motion.js"></script>
-</body>
-</html>
+  /* --- carimbos de horario: a espinha da pagina ----------------------
+     Unico lugar onde a animacao e distinta. O letter-spacing assenta,
+     como um relogio travando no minuto. */
+  document.querySelectorAll("span").forEach(el => {
+    const txt = (el.textContent || "").trim();
+    if (!/^\d{2}H\d{2}\s·\s/.test(txt)) return;
+    gsap.fromTo(el,
+      { letterSpacing: "0.42em", opacity: 0 },
+      {
+        letterSpacing: "0.18em", opacity: 1, duration: 0.9, ease: "power3.out",
+        scrollTrigger: { trigger: el, start: "top 88%", once: true }
+      }
+    );
+  });
+
+  /* --- contadores ---------------------------------------------------- */
+  const ptBR = (n, dec) =>
+    n.toLocaleString("pt-BR", { minimumFractionDigits: dec, maximumFractionDigits: dec });
+
+  document.querySelectorAll("[data-count]").forEach(el => {
+    const raw = el.textContent.trim();
+    const m = raw.match(/^(\D*?)([\d.]*\d(?:,\d+)?)(\D*)$/);
+    if (!m) return;
+    const [, pre, numStr, post] = m;
+    const target = parseFloat(numStr.replace(/\./g, "").replace(",", "."));
+    if (!isFinite(target) || Math.abs(target) < 2) return;   // "0" e "1 call" ficam parados
+    const dec = numStr.includes(",") ? numStr.split(",")[1].length : 0;
+
+    const box = { v: 0 };
+    gsap.to(box, {
+      v: Math.abs(target), duration: 1.15, ease: "power2.out",
+      scrollTrigger: { trigger: el, start: "top 88%", once: true },
+      onUpdate: () => { el.textContent = pre + ptBR(box.v, dec) + post; },
+      onComplete: () => { el.textContent = raw; }   // volta ao texto exato
+    });
+    el.textContent = pre + ptBR(0, dec) + post;
+  });
+
+  /* --- parallax discreto nas capturas de tela ------------------------
+     Faixa curta (18px) e scrub curto: o suficiente pra dar profundidade
+     sem a imagem parecer atrasada em relacao ao dedo. */
+  if (!mobile) {
+    document.querySelectorAll('img[src*="print-"]').forEach(img => {
+      gsap.fromTo(img, { y: 16 }, {
+        y: -16, ease: "none",
+        scrollTrigger: { trigger: img, start: "top bottom", end: "bottom top", scrub: 0.6 }
+      });
+    });
+  }
+
+  /* --- barra de progresso de leitura --------------------------------
+     Existe pra matar a sensacao de "estou preso": mostra que a pagina
+     tem fim e que a rolagem esta andando. */
+  const bar = document.getElementById("progress");
+  if (bar) {
+    gsap.to(bar, {
+      scaleX: 1, ease: "none",
+      scrollTrigger: { trigger: document.body, start: "top top", end: "bottom bottom", scrub: 0.25 }
+    });
+  }
+
+  /* --- nav condensa ao sair do topo ---------------------------------- */
+  const nav = document.querySelector("nav");
+  if (nav) {
+    nav.id = "nav";
+    const inner = nav.firstElementChild;
+    ST.create({
+      start: "top -40",
+      end: 99999,
+      onUpdate: self => {
+        const on = self.scroll() > 40;
+        nav.style.backgroundColor = on ? "rgba(5,5,38,.94)" : "rgba(5,5,38,.82)";
+        if (inner) inner.style.padding = on ? "8px 24px" : "12px 24px";
+      }
+    });
+  }
+
+  /* imagens que carregam depois podem deslocar os gatilhos */
+  window.addEventListener("load", () => ST.refresh());
+})();
