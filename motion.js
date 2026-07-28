@@ -235,7 +235,7 @@
           scrollTrigger: {
             trigger: ".hero-wrap",
             start: "top top",
-            end: "bottom top",
+            end: "bottom 20%",
             scrub: 0.45
           },
           onUpdate: () => {
@@ -246,7 +246,7 @@
       }, { once: true });
       hv.load();
     };
-    document.readyState === "complete" ? arm() : window.addEventListener("load", arm);
+    arm();
   }
 
   /* imagens que carregam depois podem deslocar os gatilhos */
