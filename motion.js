@@ -216,22 +216,37 @@
 
 
   /* ------------------------------------------------------------------
-     3. VIDEO DE FUNDO DO HERO
-     O celular nunca baixa o video: fica no poster (36KB). O desktop so
-     recebe o src depois que a pagina terminou de carregar, entao o video
-     nunca disputa banda com o texto e as imagens.
+     3. VIDEO DO HERO, CONTROLADO PELA ROLAGEM
+     Sem pin: a pagina rola normalmente e o video avanca junto. Rolar pra
+     cima faz ele voltar. Como nada trava, nao existe a sensacao de
+     "empurrar parede" — o video acompanha, nao sequestra.
+     O arquivo tem todo frame como keyframe, senao o seek engasga.
   ------------------------------------------------------------------ */
   const hv = document.getElementById("hero-video");
   if (hv && !mobile && !reduce && !matchMedia("(prefers-reduced-data: reduce)").matches) {
-    const canWebm = hv.canPlayType('video/webm; codecs="vp9"') !== "";
-    const start = () => {
-      hv.src = canWebm ? "assets/hero.webm" : "assets/hero.mp4";
-      hv.addEventListener("canplay", () => {
-        hv.play().then(() => hv.classList.add("on")).catch(() => {});
+    const arm = () => {
+      hv.src = "assets/hero.mp4";
+      hv.addEventListener("loadeddata", () => {
+        hv.classList.add("on");
+        const dur = isFinite(hv.duration) ? hv.duration : 6.5;
+        const clock = { t: 0 };
+        gsap.to(clock, {
+          t: dur, ease: "none",
+          scrollTrigger: {
+            trigger: ".hero-wrap",
+            start: "top top",
+            end: "bottom top",
+            scrub: 0.45
+          },
+          onUpdate: () => {
+            if (hv.readyState >= 2) hv.currentTime = clock.t;
+          }
+        });
+        ST.refresh();
       }, { once: true });
       hv.load();
     };
-    document.readyState === "complete" ? start() : window.addEventListener("load", start);
+    document.readyState === "complete" ? arm() : window.addEventListener("load", arm);
   }
 
   /* imagens que carregam depois podem deslocar os gatilhos */
