@@ -214,6 +214,26 @@
     });
   }
 
+
+  /* ------------------------------------------------------------------
+     3. VIDEO DE FUNDO DO HERO
+     O celular nunca baixa o video: fica no poster (36KB). O desktop so
+     recebe o src depois que a pagina terminou de carregar, entao o video
+     nunca disputa banda com o texto e as imagens.
+  ------------------------------------------------------------------ */
+  const hv = document.getElementById("hero-video");
+  if (hv && !mobile && !reduce && !matchMedia("(prefers-reduced-data: reduce)").matches) {
+    const canWebm = hv.canPlayType('video/webm; codecs="vp9"') !== "";
+    const start = () => {
+      hv.src = canWebm ? "assets/hero.webm" : "assets/hero.mp4";
+      hv.addEventListener("canplay", () => {
+        hv.play().then(() => hv.classList.add("on")).catch(() => {});
+      }, { once: true });
+      hv.load();
+    };
+    document.readyState === "complete" ? start() : window.addEventListener("load", start);
+  }
+
   /* imagens que carregam depois podem deslocar os gatilhos */
   window.addEventListener("load", () => ST.refresh());
 })();
