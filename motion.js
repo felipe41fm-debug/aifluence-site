@@ -214,6 +214,41 @@
     });
   }
 
+
+  /* ------------------------------------------------------------------
+     3. VIDEO DO HERO, CONTROLADO PELA ROLAGEM
+     Sem pin: a pagina rola normalmente e o video avanca junto. Rolar pra
+     cima faz ele voltar. Como nada trava, nao existe a sensacao de
+     "empurrar parede" — o video acompanha, nao sequestra.
+     O arquivo tem todo frame como keyframe, senao o seek engasga.
+  ------------------------------------------------------------------ */
+  const hv = document.getElementById("hero-video");
+  if (hv && !mobile && !reduce && !matchMedia("(prefers-reduced-data: reduce)").matches) {
+    const arm = () => {
+      hv.src = "assets/hero.mp4";
+      hv.addEventListener("loadeddata", () => {
+        hv.classList.add("on");
+        const dur = isFinite(hv.duration) ? hv.duration : 6.5;
+        const clock = { t: 0 };
+        gsap.to(clock, {
+          t: dur, ease: "none",
+          scrollTrigger: {
+            trigger: ".hero-wrap",
+            start: "top top",
+            end: "bottom 20%",
+            scrub: 0.45
+          },
+          onUpdate: () => {
+            if (hv.readyState >= 2) hv.currentTime = clock.t;
+          }
+        });
+        ST.refresh();
+      }, { once: true });
+      hv.load();
+    };
+    arm();
+  }
+
   /* imagens que carregam depois podem deslocar os gatilhos */
   window.addEventListener("load", () => ST.refresh());
 })();
