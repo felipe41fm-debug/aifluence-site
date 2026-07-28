@@ -93,6 +93,30 @@ html { scroll-behavior: smooth; }
   .hv-lift { transition: transform 200ms ease, box-shadow 200ms ease; }
   .hv-lift:hover { transform: translateY(-2px); }
 
+  /* ---- video de fundo do hero ---- */
+  .hero-wrap { position: relative; isolation: isolate; }
+  .hero-wrap > header { position: relative; z-index: 1; }
+  .hero-bg {
+    position: absolute; inset: 0; overflow: hidden; z-index: 0;
+    background: #00001E center/cover no-repeat url("assets/hero-poster.jpg");
+  }
+  .hero-video {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    opacity: 0; transition: opacity 900ms ease;
+  }
+  .hero-video.on { opacity: 1; }
+  /* escurece onde o texto entra, sem apagar a cena */
+  .hero-scrim {
+    position: absolute; inset: 0;
+    background:
+      linear-gradient(100deg, rgba(0,0,30,.90) 0%, rgba(0,0,30,.72) 42%, rgba(0,0,30,.30) 100%),
+      linear-gradient(to bottom, rgba(0,0,30,.55) 0%, transparent 22%, transparent 68%, #00001E 100%);
+  }
+  @media (max-width: 760px) {
+    .hero-scrim { background:
+      linear-gradient(to bottom, rgba(0,0,30,.72) 0%, rgba(0,0,30,.82) 55%, #00001E 100%); }
+  }
+
   /* ---- barra de progresso de leitura ---- */
   #progress {
     position: fixed; top: 0; left: 0; height: 2px; width: 100%;
@@ -140,6 +164,11 @@ html { scroll-behavior: smooth; }
 </div>
 </div>
 </nav>
+<div class="hero-wrap">
+<div class="hero-bg" aria-hidden="true">
+<video class="hero-video" muted loop playsinline preload="none" poster="assets/hero-poster.jpg" id="hero-video"></video>
+<div class="hero-scrim"></div>
+</div>
 <header class="gr1" data-hero="1" id="topo" style="max-width: 1080px; margin: 0 auto; padding: 72px 24px 24px; display: grid; gap: 48px; align-items: center;">
 <div data-anim="">
 <div style="display: inline-flex; align-items: center; gap: 10px; margin-bottom: 24px; padding: 7px 14px 7px 12px; border: 1px solid rgba(248,242,220,.18); border-radius: 999px;">
@@ -226,6 +255,7 @@ html { scroll-behavior: smooth; }
 <p style="max-width: 420px; margin: 16px 0 0 auto; font-size: 13.5px; line-height: 1.55; color: #BEB9A8; text-wrap: pretty;">Atendimento real da AIfluence, 23h46 de um domingo: a IA conduz a triagem, entende o áudio de 6 segundos e registra os valores. Às 8h o advogado acorda com o caso pronto para avaliar. O cliente falou com o escritório, não com a AIfluence.</p>
 </div>
 </header>
+</div>
 <div style="margin: 48px 0; padding: 14px 0; border-top: 1px solid rgba(248,242,220,.10); border-bottom: 1px solid rgba(248,242,220,.10); overflow: hidden;">
 <div style="display: flex; width: max-content; animation: acMarquee 38s linear infinite;">
 <div style="display: flex; gap: 40px; padding-right: 40px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: #7E7B70; white-space: nowrap;">
